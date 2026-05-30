@@ -38,7 +38,11 @@ if (!serviceWorker.body.includes("SKIP_WAITING")) throw new Error("Service worke
 
 const swCacheControl = serviceWorker.headers.get("cache-control") || "";
 if (!/no-cache|no-store|max-age=0/i.test(swCacheControl)) {
-  throw new Error("service-worker.js must be served with Cache-Control: no-cache.");
+  if (base.hostname.endsWith(".github.io")) {
+    console.warn(`Warning: GitHub Pages controls service-worker.js caching (${swCacheControl || "none"}). App updates may take a few minutes to appear.`);
+  } else {
+    throw new Error("service-worker.js must be served with Cache-Control: no-cache.");
+  }
 }
 
 console.log(`MoneyPilot deployed PWA check passed: ${base.href}`);
