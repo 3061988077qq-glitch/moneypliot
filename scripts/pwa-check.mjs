@@ -128,7 +128,7 @@ if (!JSON.stringify(vercel).includes("no-cache")) {
 }
 
 const pages = await readFile(".github/workflows/pages.yml", "utf8");
-for (const needle of ["actions/deploy-pages", "npm run check:pwa", "path: ."]) {
+for (const needle of ["contents: write", "npm run check:pwa", "Publish to gh-pages", "git push --force origin gh-pages"]) {
   if (!pages.includes(needle)) throw new Error(`GitHub Pages workflow is missing ${needle}.`);
 }
 
