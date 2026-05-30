@@ -1,0 +1,12 @@
+{
+  "name": "money-pilot-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "check:pwa": "node scripts/pwa-check.mjs",
+    "check:deploy-url": "node scripts/verify-deploy-url.mjs"
+  }
+}
