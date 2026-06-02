@@ -20,7 +20,7 @@ import {
 import { importFile } from "./importers.js";
 import { exportBackup, loadPersistentState, loadState, restoreBackupFile, saveState } from "./storage.js";
 
-const APP_VERSION = "2026.05.29.4";
+const APP_VERSION = "2026.06.02.1";
 const app = document.querySelector("#app");
 const state = loadState();
 const ui = {
@@ -33,6 +33,7 @@ const ui = {
   backupError: "",
   editingId: null,
   selectedMonth: null,
+  introOpen: false,
   pwaStatus: {
     installed: isStandalone(),
     offlineReady: false,
@@ -74,6 +75,7 @@ function render() {
     </aside>
     <main class="workspace">${route()}</main>
     ${editDrawer()}
+    ${introSheet()}
   `;
 }
 
@@ -94,12 +96,24 @@ function dashboardScreen() {
   const summary = summarize(state.transactions, state.categories);
   const insights = detectInsights(state.transactions);
   return `
-    <section class="topbar">
-      <div>
-        <p class="eyebrow">今日账本</p>
-        <h1>把每一笔钱都放回它的位置</h1>
+    <section class="intro-hero">
+      <div class="intro-copy">
+        <div class="intro-brand">
+          <span class="intro-mark">${icon("pilot")}</span>
+          <span>MoneyPilot</span>
+        </div>
+        <h1>清爽的本地账本</h1>
+        <p>记录、导入和整理日常流水。数据保存在你的设备里，安装到主屏幕后也能像 App 一样打开。</p>
+        <div class="intro-actions">
+          <button class="primary" data-action="open-new">${icon("plus")}记一笔</button>
+          <button class="secondary" data-action="show-install">${icon("phone")}查看简介</button>
+        </div>
       </div>
-      <button class="primary" data-action="open-new">${icon("plus")}记一笔</button>
+      <div class="intro-points" aria-label="MoneyPilot 特性">
+        ${introPoint("本机账本", "流水和备份都由你掌握", "shield")}
+        ${introPoint("离线可用", "缓存完成后断网也能记账", "phone")}
+        ${introPoint("干净导入", "识别结果优先，隐藏异常原文", "basket")}
+      </div>
     </section>
     <section class="card-grid">
       ${metricCard("today", "今日账本", formatCNY(summary.todayExpense), "查看今天的收入与支出", "calendar")}
@@ -119,6 +133,16 @@ function dashboardScreen() {
         </div>
       </article>
     </section>
+  `;
+}
+
+function introPoint(title, body, iconName) {
+  return `
+    <div class="intro-point">
+      <span>${icon(iconName)}</span>
+      <strong>${title}</strong>
+      <small>${body}</small>
+    </div>
   `;
 }
 
@@ -279,7 +303,7 @@ function moreScreen() {
 function installCardText() {
   if (ui.pwaStatus.installed && ui.pwaStatus.offlineReady) return "已安装，可离线使用";
   if (ui.pwaStatus.offlineReady) return "已缓存，可添加到主屏幕";
-  return "Safari 可添加到主屏幕";
+  return "查看简介与安装方式";
 }
 
 function installStatusCard() {
@@ -324,13 +348,15 @@ function transactionList(rows, options = {}) {
 
 function transactionRow(item, options) {
   const selected = state.selectedIds.includes(item.id);
+  const title = displayText(item.title, "未命名账单");
+  const payment = displayText(item.paymentMethod || item.source || "手动", "手动");
   return `
     <article class="transaction-row ${selected ? "selected" : ""}">
       ${options.selectable ? `<input type="checkbox" data-select="${item.id}" ${selected ? "checked" : ""} />` : ""}
       <button class="transaction-main" data-edit="${item.id}">
         <span class="category-badge">${categoryName(state.categories, item.categoryId)}</span>
-        <strong>${escapeHTML(item.title)}</strong>
-        <small>${formatDate(item.occurredAt)} · ${directionLabel(item.direction)} · ${escapeHTML(item.paymentMethod || item.source || "手动")}</small>
+        <strong>${escapeHTML(title)}</strong>
+        <small>${formatDate(item.occurredAt)} · ${directionLabel(item.direction)} · ${escapeHTML(payment)}</small>
       </button>
       <button class="amount ${item.direction}" data-edit="${item.id}">${item.direction === "income" ? "+" : "-"}${formatCNY(item.amountCents)}</button>
     </article>
@@ -370,11 +396,51 @@ function option(value, label, current) {
 
 function barRow(label, amount, max) {
   const percent = Math.max(4, Math.round((amount / max) * 100));
-  return `<div class="bar-row"><span>${escapeHTML(label)}</span><div><i style="width:${percent}%"></i></div><strong>${formatCNY(amount)}</strong></div>`;
+  return `<div class="bar-row"><span>${escapeHTML(displayText(label, "未分类"))}</span><div><i style="width:${percent}%"></i></div><strong>${formatCNY(amount)}</strong></div>`;
 }
 
 function empty(text) {
-  return `<div class="empty">${icon("flower")}<span>${text}</span></div>`;
+  return `<div class="empty">${icon("flower")}<span>${escapeHTML(displayText(text, "暂无内容"))}</span></div>`;
+}
+
+function introSheet() {
+  if (!ui.introOpen) return "";
+  return `
+    <div class="drawer-backdrop intro-backdrop" data-action="close-intro"></div>
+    <section class="intro-sheet" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+      <button class="icon-button intro-close" type="button" data-action="close-intro">${icon("close")}</button>
+      <div class="intro-sheet-head">
+        <span class="intro-sheet-mark">${icon("pilot")}</span>
+        <div>
+          <h2 id="intro-title">MoneyPilot 简介</h2>
+          <p>一个专注本地保存、快速记录和账单导入的轻量账本。</p>
+        </div>
+      </div>
+      <div class="intro-sheet-grid">
+        ${introStep("1", "打开网址", "用 iPhone Safari 打开已发布的 MoneyPilot 地址。")}
+        ${introStep("2", "添加到主屏幕", "点分享按钮，选择“添加到主屏幕”。")}
+        ${introStep("3", "开始记账", "从桌面图标打开，数据保存在本机，可导出完整备份。")}
+      </div>
+      <div class="intro-note">
+        <strong>隐私提示</strong>
+        <span>MoneyPilot 不需要后台服务器保存你的账本。导入文件只在当前设备解析，界面会尽量隐藏无法识别的异常字符。</span>
+      </div>
+      <div class="button-row">
+        ${deferredInstallPrompt ? `<button class="primary" data-action="prompt-install">${icon("download")}安装到此设备</button>` : ""}
+        <button class="secondary" data-action="close-intro">${icon("save")}知道了</button>
+      </div>
+    </section>
+  `;
+}
+
+function introStep(number, title, body) {
+  return `
+    <div class="intro-step">
+      <span>${number}</span>
+      <strong>${title}</strong>
+      <small>${body}</small>
+    </div>
+  `;
 }
 
 function handleClick(event) {
@@ -399,6 +465,8 @@ function handleClick(event) {
   if (action === "export-csv") downloadExport("csv");
   if (action === "pick-backup") document.querySelector("#backup-input")?.click();
   if (action === "show-install") showInstallInstructions();
+  if (action === "close-intro") setUI({ introOpen: false });
+  if (action === "prompt-install") promptNativeInstall();
   if (action === "check-update") checkForAppUpdate();
   if (action === "reload-update") activateAppUpdate();
 }
@@ -572,6 +640,17 @@ function escapeAttr(value) {
   return escapeHTML(value).replace(/`/g, "&#096;");
 }
 
+function displayText(value, fallback = "") {
+  const text = String(value ?? "")
+    .replace(/[\uFFFD]+/g, "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return fallback;
+  if (/^(?:Ã|Â|å|æ|ç|¤|¥|¨|©|±|¶|¿)+$/.test(text)) return fallback;
+  return text;
+}
+
 function icon(name) {
   const paths = {
     pilot: '<path d="M8 8c2-5 6-7 10-7s8 2 10 7c4 2 6 6 6 10 0 8-7 14-16 14S2 26 2 18c0-4 2-8 6-10Z"/><path d="m10 7-3-6c5 1 8 4 10 8M26 7l3-6c-5 1-8 4-10 8" opacity=".55"/><circle cx="13" cy="18" r="1.8"/><circle cx="23" cy="18" r="1.8"/><path d="M15 23c2 2 4 2 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
@@ -593,7 +672,8 @@ function icon(name) {
     refresh: '<path d="M29 12a12 12 0 0 0-21-4l-3 3"/><path d="M5 4v7h7"/><path d="M7 24a12 12 0 0 0 21 4l3-3"/><path d="M31 32v-7h-7"/>',
     back: '<path d="M21 8 11 18l10 10"/><path d="M12 18h18"/>',
     close: '<path d="M9 9l18 18M27 9 9 27"/>',
-    save: '<path d="M8 5h17l4 4v22H8V5Z"/><path d="M12 5v10h12V5M13 25h10"/>'
+    save: '<path d="M8 5h17l4 4v22H8V5Z"/><path d="M12 5v10h12V5M13 25h10"/>',
+    shield: '<path d="M18 4 29 8v8c0 8-5 13-11 16C12 29 7 24 7 16V8l11-4Z"/><path d="m13 18 4 4 7-8"/>'
   };
   return `<svg class="icon" viewBox="0 0 36 36" aria-hidden="true">${paths[name] || paths.sparkle}</svg>`;
 }
@@ -713,13 +793,17 @@ async function requestPersistentStorage() {
 }
 
 async function showInstallInstructions() {
+  setUI({ introOpen: true });
+}
+
+async function promptNativeInstall() {
   if (deferredInstallPrompt) {
     deferredInstallPrompt.prompt();
     await deferredInstallPrompt.userChoice.catch(() => {});
     deferredInstallPrompt = null;
     return;
   }
-  alert("iPhone 安装方法：用 Safari 打开部署后的 HTTPS 地址，点底部分享按钮，然后选择“添加到主屏幕”。安装后从桌面 MoneyPilot 图标打开。");
+  setUI({ introOpen: true });
 }
 
 function isStandalone() {
