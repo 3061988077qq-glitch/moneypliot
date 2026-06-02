@@ -20,7 +20,7 @@ import {
 import { importFile } from "./importers.js";
 import { exportBackup, loadPersistentState, loadState, restoreBackupFile, saveState } from "./storage.js";
 
-const APP_VERSION = "2026.06.02.1";
+const APP_VERSION = "2026.06.02.2";
 const app = document.querySelector("#app");
 const state = loadState();
 const ui = {
@@ -350,8 +350,9 @@ function transactionRow(item, options) {
   const selected = state.selectedIds.includes(item.id);
   const title = displayText(item.title, "未命名账单");
   const payment = displayText(item.paymentMethod || item.source || "手动", "手动");
+  const classes = ["transaction-row", options.selectable ? "selectable" : "", selected ? "selected" : ""].filter(Boolean).join(" ");
   return `
-    <article class="transaction-row ${selected ? "selected" : ""}">
+    <article class="${classes}">
       ${options.selectable ? `<input type="checkbox" data-select="${item.id}" ${selected ? "checked" : ""} />` : ""}
       <button class="transaction-main" data-edit="${item.id}">
         <span class="category-badge">${categoryName(state.categories, item.categoryId)}</span>
