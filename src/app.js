@@ -20,7 +20,7 @@ import {
 import { importFile } from "./importers.js";
 import { exportBackup, loadPersistentState, loadState, restoreBackupFile, saveState } from "./storage.js";
 
-const APP_VERSION = "2026.06.02.2";
+const APP_VERSION = "2026.06.04.1";
 const app = document.querySelector("#app");
 const state = loadState();
 const ui = {
@@ -227,33 +227,43 @@ function importScreen() {
 
 function billsScreen() {
   const bills = monthlyBills(state.transactions, state.categories);
-  const selected = bills.find((bill) => bill.month === ui.selectedMonth) || bills[0];
   return `
     <section class="topbar">
       <div>
         <p class="eyebrow">月度账单</p>
-        <h1>每个月单独统计</h1>
+        <h1>按月查看净额</h1>
       </div>
     </section>
-    <section class="bill-layout">
-      <div class="bill-list">${bills.map((bill) => `
-        <button class="bill-item ${selected?.month === bill.month ? "active" : ""}" data-month="${bill.month}">
-          <strong>${bill.month}</strong>
-          <span>${bill.count} 笔，净额 ${formatCNY(bill.net)}</span>
-        </button>
-      `).join("") || empty("暂无月度账单")}</div>
-      <article class="panel">
-        ${selected ? `
-          <div class="panel-head"><h2>${selected.month}</h2><span>${selected.count} 笔</span></div>
-          <div class="mini-metrics">
-            <div><span>收入</span><strong>${formatCNY(selected.income)}</strong></div>
-            <div><span>支出</span><strong>${formatCNY(selected.expense)}</strong></div>
-            <div><span>结余</span><strong>${formatCNY(selected.net)}</strong></div>
-          </div>
-          <div class="bars">${selected.categories.map((item) => barRow(item.name, item.expense || item.total, Math.max(selected.expense, 1))).join("")}</div>
-          ${transactionList(selected.transactions, { compact: true })}
-        ` : empty("导入或新增账单后会生成月度统计")}
-      </article>
+    <section class="bill-layout bill-layout-summary">
+      <div class="bill-list bill-summary-list">${bills.map((bill) => {
+        const open = ui.selectedMonth === bill.month;
+        return `
+          <article class="bill-group ${open ? "open" : ""}">
+            <button class="bill-item ${open ? "active" : ""}" data-month="${escapeAttr(bill.month)}" aria-expanded="${open}">
+              <span class="bill-month">
+                <strong>${bill.month}</strong>
+                <small>${bill.count} 笔流水</small>
+              </span>
+              <span class="bill-net ${bill.net >= 0 ? "income" : "expense"}">
+                <small>净额</small>
+                <strong>${formatCNY(bill.net)}</strong>
+              </span>
+              <span class="bill-chevron">${icon("chevron")}</span>
+            </button>
+            ${open ? `
+              <div class="bill-detail">
+                <div class="mini-metrics">
+                  <div><span>收入</span><strong>${formatCNY(bill.income)}</strong></div>
+                  <div><span>支出</span><strong>${formatCNY(bill.expense)}</strong></div>
+                  <div><span>结余</span><strong>${formatCNY(bill.net)}</strong></div>
+                </div>
+                <div class="bars">${bill.categories.map((item) => barRow(item.name, item.expense || item.total, Math.max(bill.expense, 1))).join("") || empty("暂无分类统计")}</div>
+                ${transactionList(bill.transactions, { compact: true })}
+              </div>
+            ` : ""}
+          </article>
+        `;
+      }).join("") || empty("暂无月度账单")}</div>
     </section>
   `;
 }
@@ -452,7 +462,7 @@ function handleClick(event) {
   const edit = event.target.closest("[data-edit]")?.dataset.edit;
   if (edit) return setUI({ editingId: edit });
   const month = event.target.closest("[data-month]")?.dataset.month;
-  if (month) return setUI({ selectedMonth: month });
+  if (month) return setUI({ selectedMonth: ui.selectedMonth === month ? null : month });
 
   const action = event.target.closest("[data-action]")?.dataset.action;
   if (!action) return;
@@ -672,6 +682,7 @@ function icon(name) {
     download: '<path d="M18 6v19"/><path d="m9 16 9 9 9-9"/><path d="M6 30h24"/>',
     refresh: '<path d="M29 12a12 12 0 0 0-21-4l-3 3"/><path d="M5 4v7h7"/><path d="M7 24a12 12 0 0 0 21 4l3-3"/><path d="M31 32v-7h-7"/>',
     back: '<path d="M21 8 11 18l10 10"/><path d="M12 18h18"/>',
+    chevron: '<path d="m12 15 6 6 6-6"/>',
     close: '<path d="M9 9l18 18M27 9 9 27"/>',
     save: '<path d="M8 5h17l4 4v22H8V5Z"/><path d="M12 5v10h12V5M13 25h10"/>',
     shield: '<path d="M18 4 29 8v8c0 8-5 13-11 16C12 29 7 24 7 16V8l11-4Z"/><path d="m13 18 4 4 7-8"/>'
