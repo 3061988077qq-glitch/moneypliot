@@ -4,15 +4,15 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const distDir = join(root, "dist");
-const archivePath = join(distDir, "moneypilot-mainland-site.zip");
+const archivePath = join(distDir, "moneypilot-ios-test-site.zip");
 
 await mkdir(distDir, { recursive: true });
 await rm(archivePath, { force: true });
 
-await run("npm", ["run", "build:mainland"]);
-await run("zip", ["-r", "-X", archivePath, "mainland-site"]);
+await run("npm", ["run", "build:ios-test"]);
+await run("zip", ["-r", "-X", archivePath, "ios-test-site"]);
 
-console.log(`MoneyPilot mainland package created: ${archivePath}`);
+console.log(`MoneyPilot iOS test package created: ${archivePath}`);
 
 function run(command, args) {
   return new Promise((resolve, reject) => {

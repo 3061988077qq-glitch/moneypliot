@@ -18,7 +18,7 @@
       </a>
       <nav aria-label="页面导航">
         <a href="#install">安装方式</a>
-        <a href="#deploy">国内访问</a>
+        <a href="#test">测试方式</a>
         <a class="nav-action" href="./app/index.html">安装 App</a>
       </nav>
     </header>
@@ -83,7 +83,7 @@
             <span>1</span>
             <div>
               <strong>用 Safari 打开网页</strong>
-              <p>访问你的个人域名，例如 https://你的域名.com/moneypilot/。</p>
+              <p>访问测试链接，或在同一 Wi-Fi 下打开你电脑提供的临时地址。</p>
             </div>
           </li>
           <li>
@@ -103,21 +103,21 @@
         </ol>
       </section>
 
-      <section id="deploy" class="deploy-section">
-        <h2>面向中国大陆用户发布</h2>
-        <p>把这个 <code>mainland-site</code> 文件夹上传到国内可访问的 HTTPS 静态网站空间即可。推荐放在个人域名下的 <code>/moneypilot/</code> 路径，用户无需访问 GitHub。</p>
+      <section id="test" class="deploy-section">
+        <h2>给其他 iOS 用户测试</h2>
+        <p>这个页面现在只用于测试分发。你可以把测试包临时放到任意 HTTPS 静态空间，或让同一 Wi-Fi 下的 iPhone 打开你电脑上的本地测试地址。</p>
         <div class="deploy-grid">
           <article>
-            <strong>个人服务器 / 宝塔 / Nginx</strong>
-            <p>上传整个文件夹到网站目录，并确保 HTTPS 证书可用。</p>
+            <strong>HTTPS 测试链接</strong>
+            <p>适合测试“添加到主屏幕”和离线缓存，分享链接给 iPhone 用户即可。</p>
           </article>
           <article>
-            <strong>阿里云 OSS / 腾讯云 COS</strong>
-            <p>开启静态网站托管，上传所有文件，绑定备案域名和 CDN。</p>
+            <strong>同 Wi-Fi 临时测试</strong>
+            <p>适合快速打开页面体验功能；普通 HTTP 局域网地址不保证可安装。</p>
           </article>
           <article>
-            <strong>更新 App</strong>
-            <p>以后更新 MoneyPilot 时，重新覆盖 <code>app</code> 目录即可。</p>
+            <strong>测试包</strong>
+            <p>运行 <code>npm run package:ios-test</code> 生成 zip，里面包含介绍页和 App。</p>
           </article>
         </div>
       </section>

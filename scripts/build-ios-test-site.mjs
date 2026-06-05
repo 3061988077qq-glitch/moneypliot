@@ -2,7 +2,7 @@ import { cp, mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 
 const root = process.cwd();
-const siteDir = join(root, "mainland-site");
+const siteDir = join(root, "ios-test-site");
 const appDir = join(siteDir, "app");
 
 const appFiles = [
@@ -28,4 +28,4 @@ for (const dir of appDirs) {
   await cp(join(root, dir), join(appDir, dir), { recursive: true });
 }
 
-console.log("MoneyPilot mainland-site/app refreshed.");
+console.log("MoneyPilot ios-test-site/app refreshed.");
