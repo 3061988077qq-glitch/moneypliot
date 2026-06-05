@@ -8,6 +8,7 @@
 mainland-site/
   index.html          # 个人介绍页
   styles.css          # 介绍页样式
+  nginx-moneypilot.conf
   app/                # MoneyPilot PWA 应用本体
 ```
 
@@ -46,6 +47,22 @@ https://你的域名.com/moneypilot/app/index.html
 - 上传时要保留 `app/assets/` 和 `app/src/` 目录。
 - 更新 App 时，重新覆盖 `app/` 目录即可。
 
+## 更新发布包
+
+每次主 App 更新后，在项目根目录运行：
+
+```bash
+npm run build:mainland
+```
+
+这个命令会把当前 MoneyPilot App 重新同步到：
+
+```text
+mainland-site/app/
+```
+
+然后上传整个 `mainland-site` 目录内容即可。
+
 ## 国内托管建议
 
 - 个人服务器或宝塔面板：把 `mainland-site` 中的所有内容上传到网站目录下的 `moneypilot` 文件夹。
@@ -67,3 +84,9 @@ location /moneypilot/app/ {
 ```
 
 Service Worker 会在 `/moneypilot/app/` 范围内缓存 MoneyPilot，不会影响网站其他页面。
+
+也可以直接参考本目录下的：
+
+```text
+nginx-moneypilot.conf
+```
