@@ -20,7 +20,7 @@ import {
 import { importFile } from "./importers.js";
 import { exportBackup, loadPersistentState, loadState, restoreBackupFile, saveState } from "./storage.js";
 
-const APP_VERSION = "2026.06.04.1";
+const APP_VERSION = "2026.06.05.1";
 const app = document.querySelector("#app");
 const state = loadState();
 const ui = {
@@ -697,7 +697,24 @@ app.addEventListener("submit", handleSubmit);
 
 if (!state.categories?.length) state.categories = DEFAULT_CATEGORIES;
 render();
+lockPageZoom();
 initializePWA();
+
+function lockPageZoom() {
+  document.addEventListener("gesturestart", (event) => event.preventDefault(), { passive: false });
+  document.addEventListener("gesturechange", (event) => event.preventDefault(), { passive: false });
+  document.addEventListener("gestureend", (event) => event.preventDefault(), { passive: false });
+  document.addEventListener("touchmove", (event) => {
+    if (event.scale && event.scale !== 1) event.preventDefault();
+  }, { passive: false });
+
+  let lastTouchEndedAt = 0;
+  document.addEventListener("touchend", (event) => {
+    const now = Date.now();
+    if (now - lastTouchEndedAt <= 300) event.preventDefault();
+    lastTouchEndedAt = now;
+  }, { passive: false });
+}
 
 async function initializePWA() {
   window.addEventListener("beforeinstallprompt", (event) => {

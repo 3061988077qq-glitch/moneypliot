@@ -17,9 +17,18 @@
 }
 
 * { box-sizing: border-box; }
+html {
+  width: 100%;
+  overflow-x: hidden;
+  touch-action: pan-x pan-y;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
 body {
   margin: 0;
+  width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     linear-gradient(135deg, rgba(251, 255, 253, 0.98), rgba(243, 252, 248, 0.96)),
     radial-gradient(circle at top left, rgba(157, 220, 200, 0.22), transparent 32rem);
