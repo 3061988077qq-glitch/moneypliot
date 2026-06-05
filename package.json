@@ -9,6 +9,7 @@
     "package:mainland": "node scripts/package-mainland-site.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "check:pwa": "node scripts/pwa-check.mjs",
+    "check:mainland-url": "node scripts/verify-mainland-url.mjs",
     "check:deploy-url": "node scripts/verify-deploy-url.mjs"
   }
 }

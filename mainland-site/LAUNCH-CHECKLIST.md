@@ -38,9 +38,17 @@ App 入口：
 https://你的域名.com/moneypilot/app/index.html
 ```
 
+如果无法注册域名，可以使用国内云厂商提供的默认 HTTPS 域名，例如 CloudBase 静态网站托管默认域名：
+
+```text
+https://你的CloudBase默认域名/
+https://你的CloudBase默认域名/app/index.html
+```
+
 ## 3. 服务器要求
 
-- 域名已备案，且中国大陆网络可访问。
+- 域名已备案，或使用国内云厂商提供的默认 HTTPS 域名。
+- 中国大陆网络可访问。
 - HTTPS 证书有效。
 - `index.html`、`.js`、`.css`、`.webmanifest`、`.png`、`.svg` 能直接访问。
 - `service-worker.js` 不要长期缓存，建议加 `Cache-Control: no-cache`。
@@ -59,7 +67,23 @@ https://你的域名.com/moneypilot/app/index.html
 7. 从主屏幕打开 MoneyPilot。
 8. 新增一笔账单，关闭后重新打开，确认数据仍在。
 
-## 5. 常见问题
+## 5. 自动验收
+
+上线后在项目根目录运行：
+
+```bash
+npm run check:mainland-url -- https://你的域名.com/moneypilot/
+```
+
+如果使用默认域名：
+
+```bash
+npm run check:mainland-url -- https://你的CloudBase默认域名/
+```
+
+这个命令通过后，再发给用户使用。
+
+## 6. 常见问题
 
 ### Safari 没有“添加到主屏幕”
 

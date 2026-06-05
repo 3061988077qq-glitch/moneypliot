@@ -7,6 +7,7 @@
 ```text
 mainland-site/
   LAUNCH-CHECKLIST.md
+  NO-DOMAIN-DEPLOY.md
   index.html          # 个人介绍页
   styles.css          # 介绍页样式
   nginx-moneypilot.conf
@@ -78,8 +79,17 @@ dist/moneypilot-mainland-site.zip
 
 上线前按 `LAUNCH-CHECKLIST.md` 检查一遍。
 
+部署到线上域名后，运行：
+
+```bash
+npm run check:mainland-url -- https://你的域名.com/moneypilot/
+```
+
+这个命令会检查介绍页、App 入口、manifest、图标、Service Worker 和 HTTPS/PWA 要求。
+
 ## 国内托管建议
 
+- 无法注册域名：优先看 `NO-DOMAIN-DEPLOY.md`，使用国内云厂商分配的默认 HTTPS 域名。
 - 个人服务器或宝塔面板：把 `mainland-site` 中的所有内容上传到网站目录下的 `moneypilot` 文件夹。
 - 阿里云 OSS：开启静态网站托管，绑定备案域名和 HTTPS/CDN。
 - 腾讯云 COS：开启静态网站托管，绑定备案域名和 HTTPS/CDN。
