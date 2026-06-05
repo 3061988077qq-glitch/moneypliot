@@ -6,6 +6,7 @@
 
 ```text
 mainland-site/
+  LAUNCH-CHECKLIST.md
   index.html          # 个人介绍页
   styles.css          # 介绍页样式
   nginx-moneypilot.conf
@@ -62,6 +63,20 @@ mainland-site/app/
 ```
 
 然后上传整个 `mainland-site` 目录内容即可。
+
+如果想生成可上传的压缩包，运行：
+
+```bash
+npm run package:mainland
+```
+
+生成文件：
+
+```text
+dist/moneypilot-mainland-site.zip
+```
+
+上线前按 `LAUNCH-CHECKLIST.md` 检查一遍。
 
 ## 国内托管建议
 

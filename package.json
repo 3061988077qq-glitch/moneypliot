@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "build:mainland": "node scripts/build-mainland-site.mjs",
+    "package:mainland": "node scripts/package-mainland-site.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "check:pwa": "node scripts/pwa-check.mjs",
     "check:deploy-url": "node scripts/verify-deploy-url.mjs"
