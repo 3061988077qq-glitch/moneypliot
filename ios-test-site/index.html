@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="description" content="MoneyPilot：面向 iPhone 的本地记账 Web App，可添加到主屏幕，支持离线使用。" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>MoneyPilot | 本地记账 App</title>
+    <link rel="icon" href="./app/assets/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./app/assets/icon-180.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="MoneyPilot 首页">
+        <img src="./app/assets/icon-192.png" alt="" />
+        <span>MoneyPilot</span>
+      </a>
+      <nav aria-label="页面导航">
+        <a href="#install">安装方式</a>
+        <a href="#test">测试方式</a>
+        <a class="nav-action" href="./app/index.html">安装 App</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>把日常流水留在自己的手机里。</h1>
+          <p>MoneyPilot 是一个轻量的本地记账 Web App。它可以在 iPhone Safari 中添加到主屏幕，像 App 一样打开，账本数据保存在设备本机。</p>
+          <div class="actions">
+            <a class="primary" href="./app/index.html">打开 / 安装 MoneyPilot</a>
+            <a class="secondary" href="#install">查看安装方式</a>
+          </div>
+        </div>
+        <div class="phone-preview" aria-label="MoneyPilot 界面预览">
+          <div class="phone-top"></div>
+          <div class="preview-brand">
+            <img src="./app/assets/icon-192.png" alt="" />
+            <strong>MoneyPilot</strong>
+          </div>
+          <h2>清爽的本地账本</h2>
+          <div class="preview-card">
+            <span>本月支出</span>
+            <strong>¥38.80</strong>
+            <small>按月查看净额和流水明细</small>
+          </div>
+          <div class="preview-row">
+            <span>餐饮</span>
+            <i></i>
+            <strong>¥38.80</strong>
+          </div>
+          <div class="preview-nav">
+            <span>仪表盘</span>
+            <span>流水</span>
+            <span>账单</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-band" aria-label="核心特点">
+        <article>
+          <h2>本地保存</h2>
+          <p>流水、分类和备份优先保存在当前设备，适合个人轻量记账。</p>
+        </article>
+        <article>
+          <h2>离线可用</h2>
+          <p>首次打开并缓存完成后，断网也能进入应用继续记录。</p>
+        </article>
+        <article>
+          <h2>按月查看</h2>
+          <p>月度账单先显示净额摘要，点击后展开收入、支出和明细。</p>
+        </article>
+      </section>
+
+      <section id="install" class="install-section">
+        <div>
+          <h2>iPhone 安装方式</h2>
+          <p>MoneyPilot 不是 App Store 安装包，而是 PWA。请用 iPhone Safari 打开本页或 App 页面，然后添加到主屏幕。</p>
+        </div>
+        <ol class="steps">
+          <li>
+            <span>1</span>
+            <div>
+              <strong>用 Safari 打开网页</strong>
+              <p>访问测试链接，或在同一 Wi-Fi 下打开你电脑提供的临时地址。</p>
+            </div>
+          </li>
+          <li>
+            <span>2</span>
+            <div>
+              <strong>点击分享按钮</strong>
+              <p>在 Safari 底部或顶部工具栏点击分享图标。</p>
+            </div>
+          </li>
+          <li>
+            <span>3</span>
+            <div>
+              <strong>添加到主屏幕</strong>
+              <p>选择“添加到主屏幕”，确认名称后即可像 App 一样打开。</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section id="test" class="deploy-section">
+        <h2>给其他 iOS 用户测试</h2>
+        <p>这个页面现在只用于测试分发。你可以把测试包临时放到任意 HTTPS 静态空间，或让同一 Wi-Fi 下的 iPhone 打开你电脑上的本地测试地址。</p>
+        <div class="deploy-grid">
+          <article>
+            <strong>HTTPS 测试链接</strong>
+            <p>适合测试“添加到主屏幕”和离线缓存，分享链接给 iPhone 用户即可。</p>
+          </article>
+          <article>
+            <strong>同 Wi-Fi 临时测试</strong>
+            <p>适合快速打开页面体验功能；普通 HTTP 局域网地址不保证可安装。</p>
+          </article>
+          <article>
+            <strong>测试包</strong>
+            <p>运行 <code>npm run package:ios-test</code> 生成 zip，里面包含介绍页和 App。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>MoneyPilot</span>
+      <a href="./app/index.html">安装 App</a>
+    </footer>
+  </body>
+</html>
