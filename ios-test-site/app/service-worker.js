@@ -1,4 +1,4 @@
-const APP_VERSION = "2026.06.05.1";
+const APP_VERSION = "2026.06.06.1";
 const CACHE_NAME = `money-pilot-web-${APP_VERSION}`;
 const APP_SHELL = [
   "./",

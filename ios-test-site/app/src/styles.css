@@ -292,7 +292,14 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 .search input { width: 100%; border: 0; outline: 0; background: transparent; }
 .transaction-list { display: grid; gap: 0.65rem; }
 .transaction-list.compact { margin-top: 1rem; }
+.transaction-swipe {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.95rem;
+}
 .transaction-row {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) max-content;
   align-items: center;
@@ -302,11 +309,30 @@ h2 { margin-bottom: 0; font-size: 1rem; }
   border-radius: 0.95rem;
   background: #fff;
   transition: transform 150ms ease, border-color 150ms ease;
+  will-change: transform;
 }
+.transaction-swipe.quick-delete-open .transaction-row { transform: translateX(5.8rem); }
+.transaction-swipe.swiping .transaction-row { transition: none; }
 .transaction-row.selectable {
   grid-template-columns: auto minmax(0, 1fr) max-content;
 }
 .transaction-row.selected { border-color: var(--pink-strong); background: #fff4f7; }
+.quick-delete {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  width: 5.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  border: 0;
+  border-radius: 0.95rem;
+  background: var(--danger);
+  color: #fff;
+  font-weight: 850;
+}
+.quick-delete .icon { width: 1rem; height: 1rem; }
 .transaction-main {
   width: 100%;
   min-width: 0;
@@ -457,15 +483,24 @@ textarea { min-height: 5.5rem; resize: vertical; }
 .intro-backdrop { z-index: 10; }
 .drawer {
   position: fixed;
-  top: 0;
-  right: 0;
+  inset: 0 0 0 auto;
   z-index: 9;
   width: min(29rem, 100vw);
-  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   overflow: auto;
-  padding: 1.2rem;
+  padding: 1.2rem 1.2rem calc(1.2rem + env(safe-area-inset-bottom));
   background: #fbfffd;
   box-shadow: -18px 0 60px rgba(34, 70, 60, 0.18);
+  overscroll-behavior: contain;
+}
+.drawer form { min-height: 100%; align-content: start; padding-bottom: env(safe-area-inset-bottom); }
+.drawer .button-row {
+  position: sticky;
+  bottom: calc(-1.2rem - env(safe-area-inset-bottom));
+  z-index: 1;
+  padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(251, 255, 253, 0.05), #fbfffd 28%);
 }
 .intro-sheet {
   position: fixed;
@@ -593,4 +628,10 @@ textarea { min-height: 5.5rem; resize: vertical; }
   .transaction-row { grid-template-columns: minmax(0, 1fr); }
   .transaction-row.selectable { grid-template-columns: auto minmax(0, 1fr); }
   .amount { grid-column: 1 / -1; width: 100%; }
+  .transaction-swipe.quick-delete-open .transaction-row { transform: translateX(5.4rem); }
+  .drawer {
+    width: 100vw;
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  }
+  .drawer .button-row { bottom: calc(-1rem - env(safe-area-inset-bottom)); }
 }

@@ -20,7 +20,7 @@ import {
 import { importFile } from "./importers.js";
 import { exportBackup, loadPersistentState, loadState, restoreBackupFile, saveState } from "./storage.js";
 
-const APP_VERSION = "2026.06.05.1";
+const APP_VERSION = "2026.06.06.1";
 const app = document.querySelector("#app");
 const state = loadState();
 const ui = {
@@ -48,6 +48,7 @@ const ui = {
 let deferredInstallPrompt = null;
 let serviceWorkerRegistration = null;
 let reloadingForUpdate = false;
+let swipeGesture = null;
 
 function setState(patch) {
   Object.assign(state, patch);
@@ -361,8 +362,8 @@ function transactionRow(item, options) {
   const title = displayText(item.title, "未命名账单");
   const payment = displayText(item.paymentMethod || item.source || "手动", "手动");
   const classes = ["transaction-row", options.selectable ? "selectable" : "", selected ? "selected" : ""].filter(Boolean).join(" ");
-  return `
-    <article class="${classes}">
+  const row = `
+    <article class="${classes}" data-swipe-foreground>
       ${options.selectable ? `<input type="checkbox" data-select="${item.id}" ${selected ? "checked" : ""} />` : ""}
       <button class="transaction-main" data-edit="${item.id}">
         <span class="category-badge">${categoryName(state.categories, item.categoryId)}</span>
@@ -370,6 +371,13 @@ function transactionRow(item, options) {
         <small>${formatDate(item.occurredAt)} · ${directionLabel(item.direction)} · ${escapeHTML(payment)}</small>
       </button>
       <button class="amount ${item.direction}" data-edit="${item.id}">${item.direction === "income" ? "+" : "-"}${formatCNY(item.amountCents)}</button>
+    </article>
+  `;
+  if (!options.selectable) return row;
+  return `
+    <article class="transaction-swipe" data-swipe-row data-id="${item.id}">
+      <button class="quick-delete" type="button" data-action="quick-delete" data-id="${item.id}">${icon("trash")}删除</button>
+      ${row}
     </article>
   `;
 }
@@ -472,6 +480,7 @@ function handleClick(event) {
   if (action === "pick-file") document.querySelector("#file-input")?.click();
   if (action === "delete-selected") deleteSelected();
   if (action === "delete-one") deleteOne(event.target.closest("[data-id]").dataset.id);
+  if (action === "quick-delete") deleteOne(event.target.closest("[data-id]").dataset.id);
   if (action === "export-backup") downloadBackup();
   if (action === "export-csv") downloadExport("csv");
   if (action === "pick-backup") document.querySelector("#backup-input")?.click();
@@ -694,6 +703,13 @@ app.addEventListener("click", handleClick);
 app.addEventListener("input", handleInput);
 app.addEventListener("change", handleChange);
 app.addEventListener("submit", handleSubmit);
+app.addEventListener("touchstart", handleSwipeStart, { passive: true });
+app.addEventListener("touchmove", handleSwipeMove, { passive: false });
+app.addEventListener("touchend", handleSwipeEnd, { passive: true });
+app.addEventListener("touchcancel", handleSwipeEnd, { passive: true });
+app.addEventListener("mousedown", handleMouseSwipeStart);
+document.addEventListener("mousemove", handleMouseSwipeMove);
+document.addEventListener("mouseup", handleMouseSwipeEnd);
 
 if (!state.categories?.length) state.categories = DEFAULT_CATEGORIES;
 render();
@@ -714,6 +730,85 @@ function lockPageZoom() {
     if (now - lastTouchEndedAt <= 300) event.preventDefault();
     lastTouchEndedAt = now;
   }, { passive: false });
+}
+
+function handleSwipeStart(event) {
+  const row = event.target.closest("[data-swipe-row]");
+  if (!row || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  startSwipe(row, touch.clientX, touch.clientY, "touch");
+}
+
+function handleSwipeMove(event) {
+  if (!swipeGesture || swipeGesture.source !== "touch" || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  moveSwipe(touch.clientX, touch.clientY, event);
+}
+
+function handleSwipeEnd() {
+  endSwipe();
+}
+
+function handleMouseSwipeStart(event) {
+  const row = event.target.closest("[data-swipe-row]");
+  if (!row || event.button !== 0) return;
+  startSwipe(row, event.clientX, event.clientY, "mouse");
+}
+
+function handleMouseSwipeMove(event) {
+  if (!swipeGesture || swipeGesture.source !== "mouse") return;
+  moveSwipe(event.clientX, event.clientY, event);
+}
+
+function handleMouseSwipeEnd() {
+  if (!swipeGesture || swipeGesture.source !== "mouse") return;
+  endSwipe();
+}
+
+function startSwipe(row, clientX, clientY, source) {
+  swipeGesture = {
+    row,
+    foreground: row.querySelector("[data-swipe-foreground]"),
+    startX: clientX,
+    startY: clientY,
+    source,
+    lastOffset: 0,
+    active: false
+  };
+}
+
+function moveSwipe(clientX, clientY, event) {
+  if (!swipeGesture || !swipeGesture.foreground) return;
+  const dx = clientX - swipeGesture.startX;
+  const dy = clientY - swipeGesture.startY;
+  if (!swipeGesture.active && Math.abs(dx) < 14) return;
+  if (!swipeGesture.active && Math.abs(dy) > Math.abs(dx)) return;
+
+  swipeGesture.active = true;
+  const offset = Math.max(0, Math.min(dx, 96));
+  if (offset > 0 || swipeGesture.row.classList.contains("quick-delete-open")) event.preventDefault();
+  closeOtherSwipeRows(swipeGesture.row);
+  swipeGesture.row.classList.add("swiping");
+  swipeGesture.lastOffset = offset;
+  swipeGesture.foreground.style.transform = `translateX(${offset}px)`;
+}
+
+function endSwipe() {
+  if (!swipeGesture || !swipeGesture.foreground) {
+    swipeGesture = null;
+    return;
+  }
+  const shouldOpen = swipeGesture.lastOffset >= 56;
+  swipeGesture.row.classList.toggle("quick-delete-open", shouldOpen);
+  swipeGesture.row.classList.remove("swiping");
+  swipeGesture.foreground.style.transform = "";
+  swipeGesture = null;
+}
+
+function closeOtherSwipeRows(currentRow) {
+  app.querySelectorAll("[data-swipe-row].quick-delete-open").forEach((row) => {
+    if (row !== currentRow) row.classList.remove("quick-delete-open");
+  });
 }
 
 async function initializePWA() {
