@@ -20,7 +20,7 @@ import {
 import { importFile } from "./importers.js";
 import { exportBackup, loadPersistentState, loadState, restoreBackupFile, saveState } from "./storage.js";
 
-const APP_VERSION = "2026.06.06.1";
+const APP_VERSION = "2026.06.06.2";
 const app = document.querySelector("#app");
 const state = loadState();
 const ui = {

@@ -19,6 +19,8 @@
 * { box-sizing: border-box; }
 html {
   width: 100%;
+  height: 100%;
+  overflow: hidden;
   overflow-x: hidden;
   touch-action: pan-x pan-y;
   text-size-adjust: 100%;
@@ -27,12 +29,18 @@ html {
 body {
   margin: 0;
   width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
   background:
     linear-gradient(135deg, rgba(251, 255, 253, 0.98), rgba(243, 252, 248, 0.96)),
     radial-gradient(circle at top left, rgba(157, 220, 200, 0.22), transparent 32rem);
   color: var(--text);
+}
+#app {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
@@ -41,12 +49,14 @@ button:disabled { cursor: not-allowed; opacity: 0.48; }
 .app-shell {
   display: grid;
   grid-template-columns: 17.5rem minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
 }
 .sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
   padding: 1.4rem;
   display: flex;
   flex-direction: column;
@@ -102,7 +112,16 @@ button:disabled { cursor: not-allowed; opacity: 0.48; }
   box-shadow: var(--shadow);
   text-align: left;
 }
-.workspace { padding: 2rem; overflow: hidden; }
+.workspace {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 2rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
 .intro-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.8fr);
@@ -508,7 +527,7 @@ textarea { min-height: 5.5rem; resize: vertical; }
   top: 50%;
   z-index: 11;
   width: min(44rem, calc(100vw - 2rem));
-  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   overflow: auto;
   transform: translate(-50%, -50%);
   padding: 1.2rem;
@@ -600,13 +619,13 @@ textarea { min-height: 5.5rem; resize: vertical; }
 .brand-mark .icon, .upload-art .icon, .metric-icon .icon, .empty .icon, .intro-mark .icon, .intro-sheet-mark .icon { width: 2rem; height: 2rem; fill: currentColor; stroke-width: 1.2; }
 
 @media (max-width: 980px) {
-  .app-shell { grid-template-columns: 1fr; padding-bottom: 4.8rem; }
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
   .sidebar {
     position: fixed;
     inset: auto 0 0 0;
     z-index: 7;
-    height: 4.7rem;
-    padding: 0.45rem;
+    height: calc(4.7rem + env(safe-area-inset-bottom));
+    padding: 0.45rem 0.45rem calc(0.45rem + env(safe-area-inset-bottom));
     display: block;
     border-top: 1px solid var(--line);
     border-right: 0;
@@ -614,7 +633,10 @@ textarea { min-height: 5.5rem; resize: vertical; }
   .brand, .install-card { display: none; }
   .nav { grid-template-columns: repeat(5, 1fr); gap: 0.25rem; }
   .nav-item { min-height: 3.75rem; justify-content: center; flex-direction: column; gap: 0.2rem; padding: 0.35rem; font-size: 0.78rem; }
-  .workspace { padding: 1rem; }
+  .workspace {
+    height: 100dvh;
+    padding: 1rem 1rem calc(5.45rem + env(safe-area-inset-bottom));
+  }
   .topbar { align-items: flex-start; flex-direction: column; }
   .intro-hero, .card-grid, .dashboard-layout, .import-grid, .more-grid, .bill-layout { grid-template-columns: 1fr; }
   .intro-copy { min-height: auto; }
